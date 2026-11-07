@@ -1,6 +1,21 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import "./App.css";
 
+// ─── Portfolio Holdings (Account P6F001044 · VITALISHER · as of 11/05/2026) ──
+interface Holding {
+  s: string;   // symbol
+  d: string;   // description
+  ac: string;  // asset class
+  q: number;   // quantity
+  p: number;   // price
+  cp: number;  // change %
+  mv: number;  // market value
+  mc: number;  // market value change $
+  mk: string;  // market/exchange
+}
+
+const PORTFOLIO_HOLDINGS: Holding[] = [{"s":"AAPL","d":"APPLE INC COM","ac":"Equities","q":2,"p":345.25,"cp":-1.22,"mv":690.5,"mc":-8.52,"mk":"NASDAQ"},{"s":"ABBV","d":"ABBVIE INC COM","ac":"Equities","q":2,"p":293.745,"cp":-0.37,"mv":587.49,"mc":-2.17,"mk":"NYSE"},{"s":"ABT","d":"ABBOTT LABS COM","ac":"Equities","q":5,"p":113.62,"cp":-1.64,"mv":568.1,"mc":-9.45,"mk":"NYSE"},{"s":"AMD","d":"ADVANCED MICRO DEVICES INC COM","ac":"Equities","q":4,"p":421.88,"cp":-13.69,"mv":1687.52,"mc":-267.6,"mk":"NASDAQ"},{"s":"AMGN","d":"AMGEN INC COM","ac":"Equities","q":2,"p":468.62,"cp":-2.06,"mv":937.24,"mc":-19.72,"mk":"NASDAQ"},{"s":"AMZN","d":"AMAZON COM INC COM","ac":"Equities","q":28,"p":261.81,"cp":-1.59,"mv":7330.68,"mc":-118.16,"mk":"NASDAQ"},{"s":"ASND","d":"ASCENDIS PHARMA BEARER SHS","ac":"Equities","q":3,"p":254.91,"cp":-1.17,"mv":764.73,"mc":-9.06,"mk":"NASDAQ"},{"s":"AZN","d":"ASTRAZENECA PLC SHS","ac":"Equities","q":5,"p":188.95,"cp":-0.03,"mv":944.75,"mc":0.3,"mk":"NYSE"},{"s":"B","d":"BARRICK MINING CORP","ac":"Equities","q":12,"p":40.38,"cp":0.62,"mv":484.56,"mc":2.34,"mk":"NYSE"},{"s":"BGT","d":"BLACKROCK FLOATING RATE INCOME TR COM","ac":"Investment Funds","q":1054,"p":9.84,"cp":-1.3,"mv":10371.36,"mc":-137.02,"mk":"NYSE"},{"s":"BIIB","d":"BIOGEN INC COM","ac":"Equities","q":2,"p":248.905,"cp":-2.18,"mv":497.81,"mc":-11.11,"mk":"NASDAQ"},{"s":"BNS","d":"BANK OF NOVA SCOTIA HALIFAX COM SHS","ac":"Equities","q":7,"p":94.1,"cp":-2.42,"mv":658.7,"mc":-16.31,"mk":"NYSE"},{"s":"BWXT","d":"BWX TECHNOLOGIES INC COM","ac":"Equities","q":1,"p":115.535,"cp":-4.91,"mv":115.54,"mc":-5.96,"mk":"NYSE"},{"s":"C","d":"CITIGROUP INC COM NEW","ac":"Equities","q":2,"p":118.505,"cp":-5.0,"mv":237.01,"mc":-12.47,"mk":"NYSE"},{"s":"CARR","d":"CARRIER GLOBAL CORP COM","ac":"Equities","q":2,"p":54.21,"cp":-2.61,"mv":108.42,"mc":-2.9,"mk":"NYSE"},{"s":"CHRYY","d":"CHORUS LTD SPONS ADR","ac":"Equities","q":2,"p":22.79,"cp":0,"mv":45.58,"mc":0,"mk":"OTC"},{"s":"COP","d":"CONOCOPHILLIPS COM","ac":"Equities","q":3,"p":138.05,"cp":0.81,"mv":414.15,"mc":3.33,"mk":"NYSE"},{"s":"CRCL","d":"CIRCLE INTERNET GROUP INC CL A","ac":"Equities","q":5,"p":67.36,"cp":-11.51,"mv":336.8,"mc":-43.8,"mk":"NYSE"},{"s":"CRM","d":"SALESFORCE INC COM","ac":"Equities","q":2,"p":223.56,"cp":-1.56,"mv":447.12,"mc":-7.1,"mk":"NYSE"},{"s":"CRWD","d":"CROWDSTRIKE HLDGS INC CL A","ac":"Equities","q":1,"p":219.76,"cp":-8.81,"mv":219.76,"mc":-21.24,"mk":"NASDAQ"},{"s":"CSCO","d":"CISCO SYS INC COM","ac":"Equities","q":20,"p":97.26,"cp":-6.13,"mv":1945.2,"mc":-127.0,"mk":"NASDAQ"},{"s":"CTSH","d":"COGNIZANT TECHNOLOGY SOLUTIONS CORP CL A","ac":"Equities","q":4,"p":66.75,"cp":1.47,"mv":267.0,"mc":3.88,"mk":"NASDAQ"},{"s":"DE","d":"DEERE & CO COM","ac":"Equities","q":1,"p":671.42,"cp":-0.75,"mv":671.42,"mc":-5.08,"mk":"NYSE"},{"s":"DELL","d":"DELL TECHNOLOGIES INC CL C","ac":"Equities","q":2,"p":331.76,"cp":-10.9,"mv":663.52,"mc":-81.2,"mk":"NYSE"},{"s":"DLTR","d":"DOLLAR TREE INC COM","ac":"Equities","q":4,"p":140.325,"cp":-4.54,"mv":561.3,"mc":-26.7,"mk":"NASDAQ"},{"s":"DPZ","d":"DOMINOS PIZZA INC COM","ac":"Equities","q":2,"p":334.91,"cp":-1.7,"mv":669.82,"mc":-11.56,"mk":"NASDAQ"},{"s":"DUK","d":"DUKE ENERGY CORP NEW COM NEW","ac":"Equities","q":3,"p":130.815,"cp":0.95,"mv":392.45,"mc":3.68,"mk":"NYSE"},{"s":"EL","d":"LAUDER ESTEE COS INC CL A","ac":"Equities","q":1,"p":109.22,"cp":-2.52,"mv":109.22,"mc":-2.82,"mk":"NYSE"},{"s":"EXPE","d":"EXPEDIA GROUP INC COM NEW","ac":"Equities","q":3,"p":275.175,"cp":-12.89,"mv":825.53,"mc":-122.11,"mk":"NASDAQ"},{"s":"F","d":"FORD MTR CO DEL COM","ac":"Equities","q":6,"p":12.5,"cp":-1.34,"mv":75.0,"mc":-1.02,"mk":"NYSE"},{"s":"FDXF","d":"FEDEX FGHT HLDG CO INC COM","ac":"Equities","q":1,"p":126.445,"cp":-2.31,"mv":126.45,"mc":-2.98,"mk":"NYSE"},{"s":"FISV","d":"FISERV INC COM","ac":"Equities","q":2,"p":62.34,"cp":0.47,"mv":124.68,"mc":0.58,"mk":"NASDAQ"},{"s":"FIX","d":"COMFORT SYS USA INC COM","ac":"Equities","q":1,"p":983.4,"cp":-9.89,"mv":983.4,"mc":-107.91,"mk":"NYSE"},{"s":"FRO","d":"FRONTLINE PLC REGISTERED SHS","ac":"Equities","q":2,"p":46.6,"cp":-3.88,"mv":93.2,"mc":-3.76,"mk":"NYSE"},{"s":"FSLR","d":"FIRST SOLAR INC COM","ac":"Equities","q":4,"p":193.17,"cp":-0.69,"mv":772.68,"mc":-5.36,"mk":"NASDAQ"},{"s":"FTRE","d":"FORTREA HLDGS INC COM","ac":"Equities","q":8,"p":20.42,"cp":-1.97,"mv":163.36,"mc":-3.28,"mk":"NASDAQ"},{"s":"GE","d":"GENERAL ELEC CO COM NEW","ac":"Equities","q":2,"p":317.105,"cp":-3.75,"mv":634.21,"mc":-24.69,"mk":"NYSE"},{"s":"GLAXF","d":"GSK PLC REGISTERED SHS","ac":"Equities","q":7,"p":25.07,"cp":0,"mv":175.49,"mc":-2.7,"mk":"OTC"},{"s":"GOOG","d":"ALPHABET INC CAP STK CL C","ac":"Equities","q":20,"p":282.905,"cp":-1.53,"mv":5658.1,"mc":-87.9,"mk":"NASDAQ"},{"s":"GPC","d":"GENUINE PARTS CO COM","ac":"Equities","q":20,"p":124.94,"cp":-1.16,"mv":2498.8,"mc":-29.2,"mk":"NYSE"},{"s":"HAL","d":"HALLIBURTON CO COM","ac":"Equities","q":4,"p":32.61,"cp":-1.18,"mv":130.44,"mc":-1.56,"mk":"NYSE"},{"s":"HAS","d":"HASBRO INC COM","ac":"Equities","q":2,"p":119.95,"cp":-1.34,"mv":239.9,"mc":-3.26,"mk":"NASDAQ"},{"s":"HD","d":"HOME DEPOT INC COM","ac":"Equities","q":8,"p":351.355,"cp":-1.15,"mv":2810.84,"mc":-32.68,"mk":"NYSE"},{"s":"HSY","d":"HERSHEY CO COM","ac":"Equities","q":2,"p":173.805,"cp":-0.4,"mv":347.61,"mc":-1.39,"mk":"NYSE"},{"s":"INTC","d":"INTEL CORP COM","ac":"Equities","q":5,"p":55.45,"cp":-4.84,"mv":277.25,"mc":-14.1,"mk":"NASDAQ"},{"s":"JPM","d":"JPMORGAN CHASE & CO COM","ac":"Equities","q":11,"p":340.95,"cp":-3.17,"mv":3750.45,"mc":-122.76,"mk":"NYSE"},{"s":"KDP","d":"KEURIG DR PEPPER INC COM","ac":"Equities","q":3,"p":37.34,"cp":1.49,"mv":112.02,"mc":1.65,"mk":"NASDAQ"},{"s":"KHC","d":"KRAFT HEINZ CO COM","ac":"Equities","q":1,"p":25.105,"cp":-1.32,"mv":25.11,"mc":-0.33,"mk":"NYSE"},{"s":"KO","d":"COCA COLA CO COM","ac":"Equities","q":12,"p":96.1,"cp":0.31,"mv":1153.2,"mc":3.6,"mk":"NYSE"},{"s":"KR","d":"KROGER CO COM","ac":"Equities","q":8,"p":69.545,"cp":0.83,"mv":556.36,"mc":4.6,"mk":"NYSE"},{"s":"KTB","d":"KONTOOR BRANDS INC COM","ac":"Equities","q":2,"p":80.43,"cp":-1.87,"mv":160.86,"mc":-3.06,"mk":"NYSE"},{"s":"LBTYA","d":"LIBERTY GLOBAL LTD REGISTERED SHS -A-","ac":"Equities","q":2,"p":9.565,"cp":-0.16,"mv":19.13,"mc":-0.03,"mk":"NASDAQ"},{"s":"LLY","d":"LILLY ELI & CO COM","ac":"Equities","q":1,"p":1394.06,"cp":-1.69,"mv":1394.06,"mc":-23.93,"mk":"NYSE"},{"s":"LNG","d":"CHENIERE ENERGY INC COM NEW","ac":"Equities","q":1,"p":287.155,"cp":-1.67,"mv":287.16,"mc":-4.86,"mk":"NYSE"},{"s":"M","d":"MACYS INC COM","ac":"Equities","q":3,"p":24.705,"cp":-3.87,"mv":74.12,"mc":-2.98,"mk":"NYSE"},{"s":"MA","d":"MASTERCARD INC CL A","ac":"Equities","q":3,"p":663.49,"cp":-1.37,"mv":1990.47,"mc":-27.57,"mk":"NYSE"},{"s":"MCK","d":"MCKESSON CORP COM","ac":"Equities","q":3,"p":1094.36,"cp":2.33,"mv":3283.08,"mc":74.76,"mk":"NYSE"},{"s":"META","d":"META PLATFORMS INC CL A","ac":"Equities","q":9,"p":608.37,"cp":-3.43,"mv":5475.33,"mc":-194.67,"mk":"NASDAQ"},{"s":"MICC","d":"THE MAGNUM ICE CREAM COMPANY B V","ac":"Equities","q":1,"p":20.115,"cp":-0.12,"mv":20.12,"mc":-0.11,"mk":"NYSE"},{"s":"MITT","d":"AG MTG INVT TR INC COM NEW","ac":"Equities","q":1,"p":4.9961,"cp":-9.49,"mv":5.0,"mc":-0.52,"mk":"NYSE"},{"s":"MRNA","d":"MODERNA INC COM","ac":"Equities","q":5,"p":243.32,"cp":-5.83,"mv":1216.6,"mc":-75.3,"mk":"NASDAQ"},{"s":"MSFT","d":"MICROSOFT CORP COM","ac":"Equities","q":3,"p":542.89,"cp":-2.32,"mv":1628.67,"mc":-38.73,"mk":"NASDAQ"},{"s":"MTD","d":"METTLER-TOLEDO INTL INC COM","ac":"Equities","q":2,"p":1695.66,"cp":-1.6,"mv":3391.32,"mc":-55.16,"mk":"NYSE"},{"s":"MU","d":"MICRON TECHNOLOGY INC COM","ac":"Equities","q":1,"p":699.63,"cp":-12.02,"mv":699.63,"mc":-95.6,"mk":"NASDAQ"},{"s":"MUA","d":"BLACKROCK MUNIASSETS FD INC COM","ac":"Investment Funds","q":50,"p":9.78,"cp":-0.31,"mv":489.0,"mc":-1.5,"mk":"NYSE"},{"s":"NFLX","d":"NETFLIX INC COM","ac":"Equities","q":40,"p":65.63,"cp":-1.14,"mv":2625.2,"mc":-30.4,"mk":"NASDAQ"},{"s":"NOC","d":"NORTHROP GRUMMAN CORP COM","ac":"Equities","q":2,"p":526.15,"cp":0.15,"mv":1052.3,"mc":1.6,"mk":"NYSE"},{"s":"NOW","d":"SERVICENOW INC COM","ac":"Equities","q":5,"p":104.905,"cp":-3.59,"mv":524.53,"mc":-19.52,"mk":"NYSE"},{"s":"NTTYY","d":"NTT INC SPONSORED ADR","ac":"Equities","q":10,"p":26.197,"cp":0.22,"mv":261.97,"mc":0.57,"mk":"OTC"},{"s":"NVDA","d":"NVIDIA CORP COM","ac":"Equities","q":36,"p":186.58,"cp":-6.77,"mv":6716.88,"mc":-487.8,"mk":"NASDAQ"},{"s":"NVS","d":"NOVARTIS AG SPONSORED ADR","ac":"Equities","q":2,"p":164.025,"cp":-0.58,"mv":328.05,"mc":-1.91,"mk":"NYSE"},{"s":"OCDGF","d":"OCADO GROUP PLC HATFIELD SHS","ac":"Equities","q":15,"p":4.5256,"cp":0,"mv":67.88,"mc":0,"mk":"OTC"},{"s":"OLN","d":"OLIN CORP COM PAR $1","ac":"Equities","q":10,"p":17.99,"cp":-0.5,"mv":179.9,"mc":-0.9,"mk":"NYSE"},{"s":"ORCL","d":"ORACLE CORP COM","ac":"Equities","q":2,"p":115.01,"cp":-7.05,"mv":230.02,"mc":-17.44,"mk":"NYSE"},{"s":"OTIS","d":"OTIS WORLDWIDE CORP COM","ac":"Equities","q":1,"p":79.385,"cp":-0.51,"mv":79.39,"mc":-0.4,"mk":"NYSE"},{"s":"OXY","d":"OCCIDENTAL PETE CORP COM","ac":"Equities","q":3,"p":57.61,"cp":0.49,"mv":172.83,"mc":0.84,"mk":"NYSE"},{"s":"PAYX","d":"PAYCHEX INC COM","ac":"Equities","q":1,"p":119.815,"cp":0.93,"mv":119.82,"mc":1.11,"mk":"NASDAQ"},{"s":"PEP","d":"PEPSICO INC COM","ac":"Equities","q":2,"p":143.0,"cp":0.41,"mv":286.0,"mc":1.16,"mk":"NASDAQ"},{"s":"PFE","d":"PFIZER INC COM","ac":"Equities","q":17,"p":30.515,"cp":-0.89,"mv":518.76,"mc":-4.67,"mk":"NYSE"},{"s":"PLTR","d":"PALANTIR TECHNOLOGIES INC CL A","ac":"Equities","q":50,"p":155.92,"cp":-9.19,"mv":7796.0,"mc":-789.0,"mk":"NASDAQ"},{"s":"PLUG","d":"PLUG PWR INC COM NEW","ac":"Equities","q":5,"p":1.35,"cp":-7.53,"mv":6.75,"mc":-0.55,"mk":"NASDAQ"},{"s":"PSMT","d":"PRICESMART INC COM","ac":"Equities","q":1,"p":162.1,"cp":-1.88,"mv":162.1,"mc":-3.1,"mk":"NASDAQ"},{"s":"PSX","d":"PHILLIPS 66 COM","ac":"Equities","q":2,"p":255.165,"cp":-1.72,"mv":510.33,"mc":-8.93,"mk":"NYSE"},{"s":"PYPL","d":"PAYPAL HLDGS INC COM","ac":"Equities","q":2,"p":59.0,"cp":-1.99,"mv":118.0,"mc":-2.4,"mk":"NASDAQ"},{"s":"RIG","d":"TRANSOCEAN LTD REG SHS","ac":"Equities","q":2,"p":5.235,"cp":-3.94,"mv":10.47,"mc":-0.43,"mk":"NYSE"},{"s":"RIOT","d":"RIOT PLATFORMS INC COM","ac":"Equities","q":10,"p":14.045,"cp":-8.62,"mv":140.45,"mc":-13.25,"mk":"NASDAQ"},{"s":"ROK","d":"ROCKWELL AUTOMATION INC COM","ac":"Equities","q":1,"p":399.38,"cp":-10.03,"mv":399.38,"mc":-44.5,"mk":"NYSE"},{"s":"ROKU","d":"ROKU INC COM CL A","ac":"Equities","q":2,"p":161.17,"cp":-0.98,"mv":322.34,"mc":-3.2,"mk":"NASDAQ"},{"s":"RTX","d":"RTX CORP COM","ac":"Equities","q":2,"p":194.91,"cp":-1.77,"mv":389.82,"mc":-7.04,"mk":"NYSE"},{"s":"SBUX","d":"STARBUCKS CORP COM","ac":"Equities","q":2,"p":107.835,"cp":-1.7,"mv":215.67,"mc":-3.73,"mk":"NASDAQ"},{"s":"SEB","d":"SEABOARD CORP DEL COM","ac":"Equities","q":1,"p":3440.98,"cp":-0.05,"mv":3440.98,"mc":-1.77,"mk":"AMEX"},{"s":"SGCFF","d":"SAGICOR FINANCIAL COMPANY LTD","ac":"Equities","q":92,"p":5.9782,"cp":0,"mv":549.99,"mc":0.09,"mk":"OTC"},{"s":"SGOV","d":"ISHARES 0-3 MNTH TREAS BD ETF","ac":"Investment Funds","q":20,"p":100.46,"cp":0.01,"mv":2009.2,"mc":0.2,"mk":"NYSE"},{"s":"SKHY","d":"SK HYNIX INC SPONSORED ADS","ac":"Equities","q":11,"p":128.45,"cp":-10.22,"mv":1412.95,"mc":-160.82,"mk":"NASDAQ"},{"s":"SNDK","d":"SANDISK CORP COM","ac":"Equities","q":1,"p":866.47,"cp":-16.48,"mv":866.47,"mc":-170.93,"mk":"NASDAQ"},{"s":"SNY","d":"SANOFI SPONS ADR","ac":"Equities","q":4,"p":47.075,"cp":-0.83,"mv":188.3,"mc":-1.58,"mk":"NASDAQ"},{"s":"SPCX","d":"SPACE EXPL TECHNOLOGIES CORP CL A","ac":"Equities","q":3,"p":124.86,"cp":-8.14,"mv":374.58,"mc":-33.18,"mk":"NASDAQ"},{"s":"T","d":"AT&T INC COM","ac":"Equities","q":10,"p":21.82,"cp":-0.05,"mv":218.2,"mc":-0.1,"mk":"NYSE"},{"s":"TEVA","d":"TEVA PHARMACEUTICAL INDS LTD SHS","ac":"Equities","q":5,"p":41.6463,"cp":-0.49,"mv":208.23,"mc":-1.02,"mk":"NYSE"},{"s":"TGT","d":"TARGET CORP COM","ac":"Equities","q":3,"p":158.225,"cp":-2.99,"mv":474.68,"mc":-14.62,"mk":"NYSE"},{"s":"TSM","d":"TAIWAN SEMICONDUCTOR MFG CO ADR","ac":"Equities","q":3,"p":362.56,"cp":-8.39,"mv":1087.68,"mc":-99.57,"mk":"NYSE"},{"s":"TTE","d":"TOTALENERGIES SE SHS","ac":"Equities","q":2,"p":90.465,"cp":0.01,"mv":180.93,"mc":-2.33,"mk":"NYSE"},{"s":"UAA","d":"UNDER ARMOUR INC CL A","ac":"Equities","q":3,"p":5.4202,"cp":-6.06,"mv":16.26,"mc":-1.05,"mk":"NYSE"},{"s":"UPS","d":"UNITED PARCEL SVC INC CL B","ac":"Equities","q":3,"p":112.49,"cp":-1.59,"mv":337.47,"mc":-5.46,"mk":"NYSE"},{"s":"USD999997","d":"U.S. DOLLARS CURRENCY","ac":"Cash","q":208.39,"p":1.0,"cp":0,"mv":208.39,"mc":0,"mk":"OTC"},{"s":"VFC","d":"V F CORP COM","ac":"Equities","q":16,"p":20.615,"cp":-1.51,"mv":329.84,"mc":-5.04,"mk":"NYSE"},{"s":"VTRS","d":"VIATRIS INC COM","ac":"Equities","q":2,"p":18.955,"cp":-1.38,"mv":37.91,"mc":-0.53,"mk":"NASDAQ"},{"s":"WDC","d":"WESTERN DIGITAL CORP COM","ac":"Equities","q":3,"p":272.83,"cp":-15.75,"mv":818.49,"mc":-153.0,"mk":"NASDAQ"},{"s":"WHR","d":"WHIRLPOOL CORP COM","ac":"Equities","q":1,"p":31.05,"cp":-4.9,"mv":31.05,"mc":-1.6,"mk":"NYSE"}];
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 interface Stock {
   symbol: string;
@@ -17,7 +32,7 @@ interface Stock {
   watched: boolean;
 }
 interface ChatMsg { role: "user" | "ai"; text: string; time: string; }
-type Tab = "dash" | "screener" | "watchlist" | "chart" | "chat";
+type Tab = "dash" | "screener" | "watchlist" | "chart" | "chat" | "portfolio";
 type SortKey = "changePct" | "price" | "volume" | "pe";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -198,6 +213,174 @@ function RangeBar({low,high,cur}:{low:number;high:number;cur:number}) {
   );
 }
 
+// ─── Portfolio Page ────────────────────────────────────────────────────────────
+function PortfolioPage() {
+  const [search, setSearch] = useState("");
+  const [acFilter, setAcFilter] = useState("All");
+  const [sortCol, setSortCol] = useState<"mv"|"cp"|"mc"|"p"|"q">("mv");
+  const [sortDir, setSortDir] = useState<"asc"|"desc">("desc");
+
+  type PSortKey = "mv"|"cp"|"mc"|"p"|"q";
+  const handleSort = (col: PSortKey) => {
+    if (sortCol === col) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortCol(col); setSortDir("desc"); }
+  };
+
+  const assetClasses = ["All", "Equities", "Investment Funds", "Cash"];
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return [...PORTFOLIO_HOLDINGS]
+      .filter(h =>
+        (h.s.toLowerCase().includes(q) || h.d.toLowerCase().includes(q)) &&
+        (acFilter === "All" || h.ac === acFilter || (acFilter === "Cash" && h.ac.startsWith("Cash")))
+      )
+      .sort((a, b) => {
+        const av = a[sortCol], bv = b[sortCol];
+        return sortDir === "desc" ? bv - av : av - bv;
+      });
+  }, [search, acFilter, sortCol, sortDir]);
+
+  const totalMV = PORTFOLIO_HOLDINGS.reduce((s, h) => s + h.mv, 0);
+  const equitiesMV = PORTFOLIO_HOLDINGS.filter(h => h.ac === "Equities").reduce((s, h) => s + h.mv, 0);
+  const fundsMV = PORTFOLIO_HOLDINGS.filter(h => h.ac === "Investment Funds").reduce((s, h) => s + h.mv, 0);
+  const cashMV = PORTFOLIO_HOLDINGS.filter(h => h.ac.startsWith("Cash")).reduce((s, h) => s + h.mv, 0);
+  const totalDayChg = PORTFOLIO_HOLDINGS.reduce((s, h) => s + h.mc, 0);
+  const gainCount = PORTFOLIO_HOLDINGS.filter(h => h.mc > 0).length;
+  const lossCount = PORTFOLIO_HOLDINGS.filter(h => h.mc < 0).length;
+
+  const fDollar = (n: number) => `$${Math.abs(n).toLocaleString("en-US", {minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  const pct2 = (n: number) => <span style={{color:n>=0?"#10b981":"#f87171",fontWeight:700}}>{n>=0?"+":""}{n.toFixed(2)}%</span>;
+  const chgCell = (n: number) => <span style={{color:n>=0?"#10b981":"#f87171",fontWeight:600}}>{n>=0?"+":""}{n>=0?"$"+n.toFixed(2):"-$"+Math.abs(n).toFixed(2)}</span>;
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:18}}>
+
+      {/* Account header */}
+      <div style={{background:"#0f172a",border:"1px solid #1e293b",borderRadius:14,padding:"16px 20px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
+          <div>
+            <div style={{fontSize:22,fontWeight:800,color:"#f1f5f9",marginBottom:2}}>My Portfolio</div>
+            <div style={{fontSize:12,color:"#64748b",display:"flex",gap:16,flexWrap:"wrap"}}>
+              <span><span style={{color:"#94a3b8"}}>Account:</span> P6F001044</span>
+              <span><span style={{color:"#94a3b8"}}>IBD:</span> P6F</span>
+              <span><span style={{color:"#94a3b8"}}>Custodian:</span> Pershing LLC</span>
+              <span><span style={{color:"#94a3b8"}}>Holdings as of:</span> 11/05/2026</span>
+              <span><span style={{color:"#94a3b8"}}>Currency:</span> USD</span>
+            </div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontSize:32,fontWeight:900,color:"#f1f5f9"}}>${totalMV.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+            <div style={{fontSize:13,color:totalDayChg>=0?"#10b981":"#f87171",fontWeight:700}}>
+              {totalDayChg>=0?"▲ +":"▼ "}{totalDayChg.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} today
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary cards */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12}}>
+        {[
+          {l:"Total Market Value",v:`$${totalMV.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`,col:"#818cf8"},
+          {l:"Equities",v:`$${equitiesMV.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`,col:"#10b981"},
+          {l:"Investment Funds",v:`$${fundsMV.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`,col:"#f59e0b"},
+          {l:"Cash & Bank Deposits",v:`$${cashMV.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`,col:"#94a3b8"},
+          {l:"Day Change",v:(totalDayChg>=0?"+":"")+`$${totalDayChg.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`,col:totalDayChg>=0?"#10b981":"#f87171"},
+        ].map(c=>(
+          <div key={c.l} style={{background:"#0f172a",border:"1px solid #1e293b",borderRadius:12,padding:"13px 15px"}}>
+            <div style={{fontSize:10,color:"#64748b",marginBottom:4,textTransform:"uppercase",letterSpacing:"0.06em"}}>{c.l}</div>
+            <div style={{fontSize:18,fontWeight:800,color:c.col}}>{c.v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Allocation bar */}
+      <div style={{background:"#0f172a",border:"1px solid #1e293b",borderRadius:12,padding:"14px 16px"}}>
+        <div style={{fontSize:12,color:"#94a3b8",fontWeight:600,marginBottom:8}}>Portfolio Allocation</div>
+        <div style={{display:"flex",height:14,borderRadius:7,overflow:"hidden",gap:1}}>
+          <div style={{width:`${(equitiesMV/totalMV)*100}%`,background:"#10b981"}} title={`Equities ${((equitiesMV/totalMV)*100).toFixed(1)}%`}/>
+          <div style={{width:`${(fundsMV/totalMV)*100}%`,background:"#f59e0b"}} title={`Funds ${((fundsMV/totalMV)*100).toFixed(1)}%`}/>
+          <div style={{width:`${(cashMV/totalMV)*100}%`,background:"#64748b"}} title={`Cash ${((cashMV/totalMV)*100).toFixed(1)}%`}/>
+        </div>
+        <div style={{display:"flex",gap:20,marginTop:8,fontSize:11,color:"#94a3b8"}}>
+          <span><span style={{color:"#10b981"}}>■</span> Equities {((equitiesMV/totalMV)*100).toFixed(1)}%</span>
+          <span><span style={{color:"#f59e0b"}}>■</span> Investment Funds {((fundsMV/totalMV)*100).toFixed(1)}%</span>
+          <span><span style={{color:"#64748b"}}>■</span> Cash {((cashMV/totalMV)*100).toFixed(1)}%</span>
+          <span style={{marginLeft:"auto"}}><span style={{color:"#10b981"}}>▲ {gainCount} Up</span> · <span style={{color:"#f87171"}}>▼ {lossCount} Down</span> · {PORTFOLIO_HOLDINGS.length} total positions</span>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div style={{background:"#0f172a",border:"1px solid #1e293b",borderRadius:12,padding:"12px 14px",display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search symbol or description..."
+          style={{background:"#1e293b",border:"1px solid #334155",borderRadius:8,padding:"8px 12px",color:"#f1f5f9",fontSize:13,width:220,outline:"none"}}/>
+        <div style={{display:"flex",gap:6}}>
+          {assetClasses.map(ac=>(
+            <button key={ac} onClick={()=>setAcFilter(ac)}
+              style={{padding:"5px 12px",borderRadius:20,background:acFilter===ac?"#6366f1":"#1e293b",border:"1px solid",borderColor:acFilter===ac?"#6366f1":"#334155",color:acFilter===ac?"#fff":"#94a3b8",fontSize:11,cursor:"pointer"}}>
+              {ac}
+            </button>
+          ))}
+        </div>
+        <span style={{fontSize:12,color:"#64748b",marginLeft:"auto"}}>{filtered.length} of {PORTFOLIO_HOLDINGS.length} positions</span>
+      </div>
+
+      {/* Holdings table */}
+      <div style={{background:"#0f172a",border:"1px solid #1e293b",borderRadius:12,overflow:"hidden"}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead>
+            <tr style={{background:"#1e293b"}}>
+              <th style={{padding:"10px 12px",textAlign:"left",color:"#64748b",fontSize:11,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>Symbol</th>
+              <th style={{padding:"10px 12px",textAlign:"left",color:"#64748b",fontSize:11,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>Description</th>
+              <th style={{padding:"10px 12px",textAlign:"center",color:"#64748b",fontSize:11,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>Asset Class</th>
+              <th style={{padding:"10px 12px",textAlign:"right",color:"#64748b",fontSize:11,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>Exchange</th>
+              {(["q","p","mv","mc","cp"] as const).map(col=>(
+                <th key={col} onClick={()=>handleSort(col)} style={{padding:"10px 12px",textAlign:"right",color:"#64748b",fontSize:11,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em",cursor:"pointer",userSelect:"none",whiteSpace:"nowrap"}}>
+                  {col==="q"?"Qty":col==="p"?"Price":col==="mv"?"Mkt Value":col==="mc"?"Day Chg $":"Day Chg %"}
+                  {sortCol===col&&(sortDir==="desc"?" ↓":" ↑")}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((h,i)=>(
+              <tr key={h.s} style={{borderBottom:"1px solid #1a2540",background:i%2===0?"transparent":"#0d1628"}}
+                onMouseEnter={e=>(e.currentTarget.style.background="#1e293b")}
+                onMouseLeave={e=>(e.currentTarget.style.background=i%2===0?"transparent":"#0d1628")}>
+                <td style={{padding:"9px 12px",fontWeight:800,color:"#818cf8",whiteSpace:"nowrap"}}>{h.s}</td>
+                <td style={{padding:"9px 12px",color:"#94a3b8",fontSize:11,maxWidth:220}}>{h.d}</td>
+                <td style={{padding:"9px 12px",textAlign:"center"}}>
+                  <span style={{fontSize:10,padding:"2px 8px",borderRadius:6,background:h.ac==="Equities"?"#052e16":h.ac==="Investment Funds"?"#1c1003":"#0f172a",color:h.ac==="Equities"?"#10b981":h.ac==="Investment Funds"?"#f59e0b":"#94a3b8",fontWeight:600}}>
+                    {h.ac.replace("Cash, Money Funds and Bank Deposits","Cash")}
+                  </span>
+                </td>
+                <td style={{padding:"9px 12px",textAlign:"right",color:"#64748b",fontSize:11}}>{h.mk}</td>
+                <td style={{padding:"9px 12px",textAlign:"right",color:"#f1f5f9"}}>{h.q % 1 === 0 ? h.q : h.q.toFixed(2)}</td>
+                <td style={{padding:"9px 12px",textAlign:"right",fontWeight:700}}>{h.p>0?`$${h.p.toFixed(2)}`:"—"}</td>
+                <td style={{padding:"9px 12px",textAlign:"right",fontWeight:700,color:"#f1f5f9"}}>{fDollar(h.mv)}</td>
+                <td style={{padding:"9px 12px",textAlign:"right"}}>{h.mc!==0?chgCell(h.mc):"—"}</td>
+                <td style={{padding:"9px 12px",textAlign:"right"}}>{h.cp!==0?pct2(h.cp):"—"}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr style={{background:"#1e293b",borderTop:"2px solid #334155"}}>
+              <td colSpan={6} style={{padding:"10px 12px",fontWeight:700,color:"#f1f5f9",fontSize:13}}>TOTAL ({filtered.length} positions)</td>
+              <td style={{padding:"10px 12px",textAlign:"right",fontWeight:800,color:"#818cf8",fontSize:14}}>
+                ${filtered.reduce((s,h)=>s+h.mv,0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+              </td>
+              <td style={{padding:"10px 12px",textAlign:"right",fontWeight:700}}>
+                {chgCell(filtered.reduce((s,h)=>s+h.mc,0))}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main App ──────────────────────────────────────────────────────────────────
 export default function App() {
   const [stocks, setStocks] = useState<Stock[]>(SEEDS);
@@ -278,6 +461,7 @@ export default function App() {
 
   const TABS:Array<{id:Tab;label:string}> = [
     {id:"dash",label:"Dashboard"},
+    {id:"portfolio",label:"My Portfolio"},
     {id:"screener",label:"Screener"},
     {id:"watchlist",label:"Watchlist"},
     {id:"chart",label:"Chart"},
@@ -608,6 +792,9 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {/* ══════ MY PORTFOLIO ══════ */}
+        {tab==="portfolio"&&<PortfolioPage/>}
 
         {/* ══════ AI CHAT ══════ */}
         {tab==="chat"&&(
